@@ -24,7 +24,8 @@ OBJS := \
 	display_sdl.o \
 	cairo.o \
 	cformat.o \
-	cairoglue.o
+	cairoglue.o \
+	bargraph.o
 
 LIBRARIES := minuitk.a minuitk.so
 
