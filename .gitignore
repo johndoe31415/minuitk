@@ -3,3 +3,4 @@
 minuitk.a
 minuitk.so
 tests/test_simple
+tests/test_fps

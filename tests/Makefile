@@ -13,9 +13,9 @@ LDFLAGS += `pkg-config --libs cairo` -lfontconfig
 CFLAGS += `pkg-config --cflags sdl2`
 LDFLAGS += `pkg-config --libs sdl2`
 
-
 OBJS := \
-	test_simple
+	test_simple \
+	test_fps
 
 all: $(OBJS)
 
