@@ -1,0 +1,75 @@
+#!/usr/bin/python3
+#
+#	minuitk - Minimalistic UI tookit
+#	Copyright (C) 2020-2020 Johannes Bauer
+#
+#	This file is part of minuitk.
+#
+#	minuitk is free software; you can redistribute it and/or modify
+#	it under the terms of the GNU General Public License as published by
+#	the Free Software Foundation; this program is ONLY licensed under
+#	version 3 of the License, later versions are explicitly excluded.
+#
+#	minuitk is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	GNU General Public License for more details.
+#
+#	You should have received a copy of the GNU General Public License
+#	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#	Johannes Bauer <JohannesBauer@gmx.de>
+
+import datetime
+import re
+
+class HeaderExporter():
+	_HEADER_CORE_RE = re.compile("^#ifndef (?P<includeguard>__[_A-Z]+__)\n#define (?P=includeguard)\n(?P<core>.*)\n#endif", flags = re.MULTILINE | re.DOTALL)
+	_INCLUDE_RE = re.compile("^#include (?P<include>[^\n]+)\n", flags = re.MULTILINE)
+
+	def __init__(self, import_files):
+		self._import_files = import_files
+		self._combined_header = [ ]
+		self._includes = [ ]
+
+	def _get_core(self, header_filename):
+		with open(header_filename) as f:
+			text = f.read()
+		match = self._HEADER_CORE_RE.search(text)
+		if match is None:
+			raise Exception("No core: %s" % (header_filename))
+		match = match.groupdict()
+		core = match["core"]
+		core = core.strip("\r\n\t ")
+		return core
+
+	def _include_match(self, match):
+		match = match.groupdict()
+		include = match["include"]
+		if include.startswith("<"):
+			self._includes.append(include)
+		return ""
+
+	def _export_file(self, header_filename):
+		text = self._get_core(header_filename)
+		text = self._INCLUDE_RE.sub(self._include_match, text)
+		self._combined_header.append(text)
+
+	def export(self):
+		for import_file in self._import_files:
+			self._export_file(import_file)
+
+		with open("minuitk.h", "w") as f:
+			print("#ifndef __MINUITK_H__", file = f)
+			print("#define __MINUITK_H__", file = f)
+			print(file = f)
+			for include in self._includes:
+				print("#include %s" % (include), file = f)
+			print(file = f)
+			f.write("\n".join(self._combined_header))
+			print(file = f)
+			print(file = f)
+			print("#endif", file = f)
+
+header_exporter = HeaderExporter([ "colors.h", "ui_events.h", "cairo.h", "display.h", "display_sdl.h", "display_fb.h", "cairoglue.h" ])
+header_exporter.export()
