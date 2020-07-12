@@ -2,17 +2,10 @@
 #define __MINUITK_H__
 
 #include <stdint.h>
-#include <SDL2/SDL.h>
-#include <stdint.h>
 #include <stdbool.h>
+#include <pthread.h>
 #include <cairo/cairo.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <pthread.h>
 #include <SDL2/SDL.h>
-#include <pthread.h>
-#include <stdint.h>
-#include <stdbool.h>
 
 #define UINT8(x)					((x) & 0xff)
 #define GET_R(rgb)					UINT8((rgb) >> 16)
@@ -78,9 +71,6 @@ struct ui_event_textinput_t {
 };
 
 typedef void (*ui_event_cb_t)(enum ui_eventtype_t event_type, void *event, void *ctx);
-
-/*************** AUTO GENERATED SECTION FOLLOWS ***************/
-/***************  AUTO GENERATED SECTION ENDS   ***************/
 
 struct cairo_swbuf_t {
 	cairo_surface_t *surface;
@@ -151,21 +141,6 @@ struct table_definition_t {
 	void (*rendering_callback)(char *dest_buf, unsigned int dest_buf_length, struct font_placement_t *placement, unsigned int x, unsigned int y, void *ctx);
 };
 
-/*************** AUTO GENERATED SECTION FOLLOWS ***************/
-struct cairo_swbuf_t *create_swbuf(unsigned int width, unsigned int height);
-void swbuf_clear(struct cairo_swbuf_t *surface, uint32_t bgcolor);
-uint32_t* swbuf_get_pixel_data(const struct cairo_swbuf_t *surface);
-uint32_t swbuf_get_pixel(const struct cairo_swbuf_t *surface, unsigned int x, unsigned int y);
-void swbuf_render_table(struct cairo_swbuf_t *surface, const struct table_definition_t *table, void *ctx);
-unsigned int swbuf_text(struct cairo_swbuf_t *surface, const struct font_placement_t *placement, const char *fmt, ...);
-void swbuf_rect(struct cairo_swbuf_t *surface, const struct rect_placement_t *placement);
-void swbuf_circle(struct cairo_swbuf_t *surface, unsigned int x, unsigned int y, unsigned int radius, uint32_t color);
-void swbuf_dump(struct cairo_swbuf_t *surface, const char *png_filename);
-void free_swbuf(struct cairo_swbuf_t *buffer);
-void cairo_addfont(const char *font_ttf_filename);
-void cairo_cleanup(void);
-/***************  AUTO GENERATED SECTION ENDS   ***************/
-
 struct display_t;
 struct display_calltable_t;
 
@@ -195,15 +170,6 @@ struct display_calltable_t {
 	unsigned int (*get_ctx_size)(void);
 };
 
-/*************** AUTO GENERATED SECTION FOLLOWS ***************/
-struct display_t* display_init(const struct display_calltable_t *calltable, void *init_ctx);
-void display_free(struct display_t *display);
-void display_fill(struct display_t *display, uint32_t color);
-void display_commit(struct display_t *display);
-void display_put_pixel(struct display_t *display, unsigned int x, unsigned int y, uint32_t color);
-void display_test(struct display_t *display);
-/***************  AUTO GENERATED SECTION ENDS   ***************/
-
 struct display_sdl_ctx_t {
 	SDL_Window *window;
 	SDL_Surface *surface;
@@ -216,11 +182,6 @@ struct display_sdl_init_t {
 
 extern const struct display_calltable_t display_sdl_calltable;
 
-/*************** AUTO GENERATED SECTION FOLLOWS ***************/
-void display_sdl_register_events(struct display_t *display, ui_event_cb_t event_callback, void *ctx);
-/***************  AUTO GENERATED SECTION ENDS   ***************/
-
-
 struct display_fb_ctx_t {
 	int fd;
 	uint8_t *screen;
@@ -228,11 +189,29 @@ struct display_fb_ctx_t {
 
 extern const struct display_calltable_t display_fb_calltable;
 
-/*************** AUTO GENERATED SECTION FOLLOWS ***************/
-/***************  AUTO GENERATED SECTION ENDS   ***************/
 
-/*************** AUTO GENERATED SECTION FOLLOWS ***************/
+struct cairo_swbuf_t *create_swbuf(unsigned int width, unsigned int height);
+void swbuf_clear(struct cairo_swbuf_t *surface, uint32_t bgcolor);
+uint32_t* swbuf_get_pixel_data(const struct cairo_swbuf_t *surface);
+uint32_t swbuf_get_pixel(const struct cairo_swbuf_t *surface, unsigned int x, unsigned int y);
+void swbuf_render_table(struct cairo_swbuf_t *surface, const struct table_definition_t *table, void *ctx);
+unsigned int swbuf_text(struct cairo_swbuf_t *surface, const struct font_placement_t *placement, const char *fmt, ...);
+void swbuf_rect(struct cairo_swbuf_t *surface, const struct rect_placement_t *placement);
+void swbuf_circle(struct cairo_swbuf_t *surface, unsigned int x, unsigned int y, unsigned int radius, uint32_t color);
+void swbuf_dump(struct cairo_swbuf_t *surface, const char *png_filename);
+void free_swbuf(struct cairo_swbuf_t *buffer);
+void cairo_addfont(const char *font_ttf_filename);
+void cairo_cleanup(void);
+
+struct display_t* display_init(const struct display_calltable_t *calltable, void *init_ctx);
+void display_free(struct display_t *display);
+void display_fill(struct display_t *display, uint32_t color);
+void display_commit(struct display_t *display);
+void display_put_pixel(struct display_t *display, unsigned int x, unsigned int y, uint32_t color);
+void display_test(struct display_t *display);
+
+void display_sdl_register_events(struct display_t *display, ui_event_cb_t event_callback, void *ctx);
+
 void blit_swbuf_on_display(struct cairo_swbuf_t *swbuf, struct display_t *target);
-/***************  AUTO GENERATED SECTION ENDS   ***************/
 
 #endif

@@ -24,13 +24,16 @@ import datetime
 import re
 
 class HeaderExporter():
-	_HEADER_CORE_RE = re.compile("^#ifndef (?P<includeguard>__[_A-Z]+__)\n#define (?P=includeguard)\n(?P<core>.*)\n#endif", flags = re.MULTILINE | re.DOTALL)
-	_INCLUDE_RE = re.compile("^#include (?P<include>[^\n]+)\n", flags = re.MULTILINE)
+	_HEADER_CORE_RE = re.compile(r"^#ifndef (?P<includeguard>__[_A-Z]+__)\n#define (?P=includeguard)\n(?P<core>.*)\n#endif", flags = re.MULTILINE | re.DOTALL)
+	_INCLUDE_RE = re.compile(r"^#include (?P<include>[^\n]+)\n", flags = re.MULTILINE)
+	_PROTOTYPE_RE = re.compile(r"^/\*+ AUTO GENERATED SECTION FOLLOWS[^\n]+\n(?P<prototypes>.*)^/\*+  AUTO GENERATED SECTION ENDS.*$", flags = re.MULTILINE | re.DOTALL)
+	_DUPLICATE_NEWLINES_RE = re.compile(r"^\n{2,}", flags = re.MULTILINE)
 
 	def __init__(self, import_files):
 		self._import_files = import_files
 		self._combined_header = [ ]
 		self._includes = [ ]
+		self._prototypes = [ ]
 
 	def _get_core(self, header_filename):
 		with open(header_filename) as f:
@@ -50,9 +53,19 @@ class HeaderExporter():
 			self._includes.append(include)
 		return ""
 
+	def _prototype_match(self, match):
+		match = match.groupdict()
+		prototype = match["prototypes"].strip("\r\n\t ")
+		if prototype != "":
+			self._prototypes.append(prototype)
+		return ""
+
 	def _export_file(self, header_filename):
 		text = self._get_core(header_filename)
 		text = self._INCLUDE_RE.sub(self._include_match, text)
+		text = self._PROTOTYPE_RE.sub(self._prototype_match, text)
+		text = self._DUPLICATE_NEWLINES_RE.sub("", text)
+		text = text.strip("\r\n\t ")
 		self._combined_header.append(text)
 
 	def export(self):
@@ -63,11 +76,19 @@ class HeaderExporter():
 			print("#ifndef __MINUITK_H__", file = f)
 			print("#define __MINUITK_H__", file = f)
 			print(file = f)
+			self._includes = sorted(set(self._includes), key = lambda include: {
+				"<stdint.h>":		0,
+				"<stdbool.h>":		1,
+				"<pthread.h>":		100,
+				"<cairo/cairo.h>":	200,
+				"<SDL2/SDL.h>":		300,
+			}.get(include, 1000))
 			for include in self._includes:
 				print("#include %s" % (include), file = f)
 			print(file = f)
-			f.write("\n".join(self._combined_header))
+			f.write("\n\n".join(self._combined_header))
 			print(file = f)
+			f.write("\n\n".join(self._prototypes) + "\n")
 			print(file = f)
 			print("#endif", file = f)
 
