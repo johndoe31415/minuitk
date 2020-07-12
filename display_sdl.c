@@ -51,9 +51,6 @@ static void display_sdl_fill(struct display_t *display, uint32_t rgb) {
 	}
 }
 
-
-
-
 static void display_sdl_handle_event(struct display_t *display, SDL_Event *event) {
 	if (!display->hmi_events.event_callback) {
 		/* We cannot callback anyways, discard event */

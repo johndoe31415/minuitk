@@ -1,3 +1,5 @@
 .*.swp
 *.o
+minuitk.a
+minuitk.so
 tests/test_simple

@@ -52,7 +52,6 @@ int main(int argc, char **argv) {
 		swbuf_text(swbuf, &(const struct font_placement_t){
 			.font_size = 48,
 			.font_color = COLOR_CARROT,
-			.font_face = "Arial",
 		}, "Test %d!", counter);
 
 		blit_swbuf_on_display(swbuf, display);

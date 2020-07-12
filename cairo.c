@@ -236,7 +236,7 @@ unsigned int swbuf_text(struct cairo_swbuf_t *surface, const struct font_placeme
 	}
 
 	cairo_text_extents_t extents;
-	cairo_select_font_face(surface->ctx, placement->font_face, CAIRO_FONT_SLANT_NORMAL, placement->font_bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
+	cairo_select_font_face(surface->ctx, placement->font_face ? placement->font_face : "default", CAIRO_FONT_SLANT_NORMAL, placement->font_bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size(surface->ctx, placement->font_size);
 	cairo_text_extents(surface->ctx, text, &extents);
 
